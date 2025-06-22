@@ -47,5 +47,6 @@ export const searchProductsApi = async (term) => {
 
 export const getProductApi = async (id) => {
     const response = await axios.get(`${API_BASE_URL}/products/${id}`);
-    return newProductsList([response.data]);
+    const [products] = newProductsList([response.data]);
+    return products;
 }

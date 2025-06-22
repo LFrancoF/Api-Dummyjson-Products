@@ -1,0 +1,175 @@
+openapi: 3.0.4
+info:
+  title: API de Productos Dummyjson con Historial
+  version: 1.0.12
+  description: Api que consume los datos de dummyjson.com/products y guarda el historial de productos visitados en una base de datos sqlite.
+  contact:
+    name: Gustavo Franco
+    url: https://github.com/LFrancoF
+
+servers:
+  - url: http://localhost:3000
+
+tags:
+  - name: Productos
+    description: EndPoints que consumen la Api de Dummyjson
+  - name: Historial
+    description: Endpoints que consultan la base de datos sqlite que guarda el historial de productos visitados
+
+paths:
+  /products:
+    get:
+      tags:
+        - Productos
+      summary: Obtener todos los productos
+      description: Devuelve una lista de productos desde Dummyjson, por defecto, muestra los primeros 30 de un total de 194.
+      responses:
+        '200':
+          description: Lista de productos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ApiProduct'
+                  total:
+                    type: integer
+                    example: 194
+                  skip:
+                    type: integer
+                    example: 0
+                  limit:
+                    type: integer
+                    example: 30
+        '500':
+          description: Error al obtener productos
+
+  /search:
+    get:
+      tags:
+        - Productos
+      summary: Buscar productos
+      description: Busca productos que coincidan con el valor de 'q' en Dummyjson.
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+          required: true
+          description: "Término de busqueda (por ejemplo: phone, laptop)"
+      responses:
+        '200':
+          description: Lista de productos que coinciden con la busqueda
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ApiProduct'
+                  total:
+                    type: integer
+                    example: 194
+                  skip:
+                    type: integer
+                    example: 0
+                  limit:
+                    type: integer
+                    example: 30
+        '500':
+          description: Error al buscar el producto
+
+  /products/{id}:
+    get:
+      tags:
+        - Productos
+      summary: Obtener un producto por ID
+      description: Devuelve un producto de Dummyjson segun el ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del producto
+      responses:
+        '200':
+          description: Producto encontrado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiProduct'
+        '500':
+          description: Error al buscar el producto
+
+  /history:
+    get:
+      tags:
+        - Historial
+      summary: Obtener el historial de los últimos 5 productos visitados
+      description: "Devuelve una lista de los últimos 5 productos de Dummyjson visitados con el ID, es decir, con el endpoint /products/:id, el cual se guarda en una base de datos sqlite."
+      responses:
+        '200':
+          description: Historial de productos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/historyProduct'
+        '500':
+          description: Error al obtener productos
+
+components:
+  schemas:
+    ApiProduct:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Essence Mascara Lash Princess
+        description:
+          type: string
+          example: Mascara popular para alargar y dar volumen a las pestañas.
+        price:
+          type: number
+          example: 9.99
+        category:
+          type: string
+          example: beauty
+        thumbnailImage:
+          type: string
+          format: uri
+          example: https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/thumbnail.webp
+
+    historyProduct:
+      type: object
+      properties:
+        productId:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Essence Mascara Lash Princess
+        description:
+          type: string
+          example: Mascara popular para alargar y dar volumen a las pestañas.
+        price:
+          type: number
+          example: 9.99
+        image:
+          type: string
+          format: uri
+          example: https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/thumbnail.webp
+        visitedAt:
+          type: string
+          format: date-time
+          example: "2025-06-212 01:42:31"

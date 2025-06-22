@@ -1,8 +1,6 @@
 import db from '../config/configDB.js';
 
-export const saveHistory = (productRes) => {
-
-    const [product] = productRes;
+export const saveHistory = (product) => {
     
     const { id: productId, title, description, price, thumbnailImage: image } = product;
 
@@ -18,7 +16,7 @@ export const saveHistory = (productRes) => {
 }
 
 export const getLast5Products = () => {
-    const query = `SELECT productId, title, description, price, image, datetime(visitedAt,'localtime') FROM products ORDER BY id DESC LIMIT 5`;
+    const query = `SELECT productId, title, description, price, image, datetime(visitedAt,'localtime') as visitedAt FROM products ORDER BY id DESC LIMIT 5`;
 
     return new Promise((resolve, reject) => {
         db.all(query, [], (err, rows) => {
